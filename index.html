@@ -1,0 +1,38 @@
+<!doctype html>
+<html class="no-js" lang="">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>Neighborhood Map</title>
+    <meta name="description" content="Displays interesting locations within my neighborhood.">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="css/normalize.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+
+<body>
+    <nav id="sidebar">
+        <p id="collapse-icon">&#9776;</p>
+        <div>
+            <input id="filter-input" type="text" data-bind="value: filterQuery">
+            <button id="filter-button" data-bind="click: filter">Filter</button>
+        </div>
+        <ul data-bind="foreach: currentLocations">
+            <li data-bind="text: title, click: $parent.highlight"></li>
+        </ul>
+    </nav>
+    <main id="map">
+
+    </main>
+
+    <script src="js/knockout-3.4.2.js"></script>
+    <script src="js/jquery-3.2.1.min.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBC3iHbmpR6NEVrA68AoxK5lf6bNsicsaE&v=3"></script>
+    <script src="js/main.js"></script>
+</body>
+
+</html>
