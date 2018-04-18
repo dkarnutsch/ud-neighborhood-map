@@ -1,105 +1,9 @@
-var App = {};
 jQuery(document).ready(function () {
-    // global map object, so map can be used by multiple functions
-    var map;
+    var appViewModel = {};
+    var mapViewModel = {};
 
-    // Info window, shown if marker is selected
-    var largeInfowindow = new google.maps.InfoWindow();
-
-    // sets the map, centers it to salzburg and displays all markers
-    function initMap() {
-        // Constructor creates a new map - only center and zoom are required.
-        map = new google.maps.Map(document.getElementById('map'), {
-            center: { lat: 47.8062299, lng: 13.0326597 },
-            zoom: 14,
-            disableDefaultUI: true
-        });
-
-        // Create a marker per location
-        App.locationMarkers.forEach(function (marker) {
-            marker.setMap(map);
-
-            // Create an onclick event to open the large infowindow at each marker.
-            marker.addListener('click', function () {
-                populateInfoWindow(this);
-            });
-        });
-    }
-
-    // This function populates the infowindow when the marker is clicked. We'll only allow
-    // one infowindow which will open at the marker that is clicked, and populate based
-    // on that markers position.
-    function populateInfoWindow(marker) {
-        // Check to make sure the infowindow is not already opened on this marker.
-        if (largeInfowindow.marker != marker) {
-            // Clear the infowindow content to give the streetview time to load.
-            largeInfowindow.setContent(getMarkerContent(marker.title, marker.position.lat(), marker.position.lng()));
-            largeInfowindow.marker = marker;
-            // Make sure the marker property is cleared if the infowindow is closed.
-            largeInfowindow.addListener('closeclick', function () {
-                largeInfowindow.marker = null;
-            });
-
-            // Open the infowindow on the correct marker.
-            largeInfowindow.open(map, marker);
-
-            // start the animation
-            marker.setAnimation(google.maps.Animation.BOUNCE);
-            setTimeout(function () { marker.setAnimation(null); }, 750); // stop after one bounce
-        }
-    }
-
-    function getMarkerContent(title, lat, lng) {
-        var foursquare_client_id = "K4X2LMMP4H1X20XFK51GMHQN4FMQ433RFOWMPEBH3INMRXEB";
-        var foursquare_client_secret = "PZOAFTSG4VXHXZ0LS312FWDZOV5H1COQMMLV111WNW0LMQDL";
-        var categoryId = "4d4b7105d754a06374d81259"; // Restaurant: see https://developer.foursquare.com/docs/resources/categories
-
-        var url = "https://api.foursquare.com/v2/venues/search?v=20180323&radius=100&client_id=" + foursquare_client_id +
-            "&client_secret=" + foursquare_client_secret + "&categoryId=" + categoryId + "&ll=" + lat + "," + lng;
-
-        var str = "<h2>Restaurant recommendations near " + title + '</h2><div id="infoWindowsMessage"></div>';
-
-        $.ajax(url)
-            .done(function (data) {
-                var $venueList = $("#infoWindowsMessage");
-
-                data.response.venues.forEach(function (venue) {
-                    $venueList.html($venueList.html() + venue.name + " -- " + venue.location.formattedAddress + "<br>");
-                });
-            })
-            .fail(function (data) {
-                console.log(data);
-                var $venueList = $("#infoWindowsMessage");
-                $venueList.html("Unable to load data from Foursquare.");
-            });
-
-        return str;
-    }
-
-    // Hides all markers from the map
-    function hideMarkers(markers) {
-        markers.forEach(function (item) {
-            item.setMap(null);
-        });
-    }
-
-    // Shows the current filtered locations
-    function showMarkers(markers, locations) {
-        var locationIds = [];
-        locations.forEach(function (item) {
-            locationIds.push(item.id)
-        });
-
-        markers.forEach(function (item) {
-            if (locationIds.indexOf(item.id) > -1) {
-                item.setMap(map);
-            }
-        });
-    }
-
-    // ********************************************************************************************
-
-    function AppViewModel() {
+    // This view model is repsonsible for handling all map related stuff
+    function MapViewModel() {
         var self = this;
 
         // Hardcoded Marker Data
@@ -134,16 +38,118 @@ jQuery(document).ready(function () {
             title: 'Red Bull Hangar-7'
         })];
 
+        // global map object, so map can be used by multiple functions
+        var map;
+
+        // Info window, shown if marker is selected
+        var largeInfowindow = new google.maps.InfoWindow();
+
+        // sets the map, centers it to salzburg and displays all markers
+        this.initMap = function () {
+            // Constructor creates a new map - only center and zoom are required.
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: { lat: 47.8062299, lng: 13.0326597 },
+                zoom: 14,
+                disableDefaultUI: true
+            });
+
+            // Create a marker per location
+            self.locationMarkers.forEach(function (marker) {
+                marker.setMap(map);
+
+                // Create an onclick event to open the large infowindow at each marker.
+                marker.addListener('click', function () {
+                    self.populateInfoWindow(this);
+                });
+            });
+        };
+
+        // This function populates the infowindow when the marker is clicked. We'll only allow
+        // one infowindow which will open at the marker that is clicked, and populate based
+        // on that markers position.
+        this.populateInfoWindow = function (marker) {
+            // Check to make sure the infowindow is not already opened on this marker.
+            if (largeInfowindow.marker != marker) {
+                // Clear the infowindow content to give the streetview time to load.
+                largeInfowindow.setContent(self.getMarkerContent(marker.title, marker.position.lat(), marker.position.lng()));
+                largeInfowindow.marker = marker;
+                // Make sure the marker property is cleared if the infowindow is closed.
+                largeInfowindow.addListener('closeclick', function () {
+                    largeInfowindow.marker = null;
+                });
+
+                // Open the infowindow on the correct marker.
+                largeInfowindow.open(map, marker);
+
+                // start the animation
+                marker.setAnimation(google.maps.Animation.BOUNCE);
+                setTimeout(function () { marker.setAnimation(null); }, 750); // stop after one bounce
+            }
+        };
+
+        // Feteches information about nearby restaurants using the FourSquare API
+        this.getMarkerContent = function (title, lat, lng) {
+            const foursquare_client_id = 'K4X2LMMP4H1X20XFK51GMHQN4FMQ433RFOWMPEBH3INMRXEB';
+            const foursquare_client_secret = 'PZOAFTSG4VXHXZ0LS312FWDZOV5H1COQMMLV111WNW0LMQDL';
+            const categoryId = '4d4b7105d754a06374d81259'; // Restaurant: see https://developer.foursquare.com/docs/resources/categories
+
+            var url = 'https://api.foursquare.com/v2/venues/search?v=20180323&radius=100&client_id=' + foursquare_client_id +
+                '&client_secret=' + foursquare_client_secret + '&categoryId=' + categoryId + '&ll=' + lat + ',' + lng;
+
+            var str = '<h2>Restaurant recommendations near ' + title + '</h2><div id="infoWindowsMessage"></div>';
+
+            $.ajax(url)
+                .done(function (data) {
+                    var $venueList = $('#infoWindowsMessage');
+
+                    data.response.venues.forEach(function (venue) {
+                        $venueList.html($venueList.html() + venue.name + ' -- ' + venue.location.formattedAddress.join(', ') + '<br>');
+                    });
+                })
+                .fail(function (data) {
+                    console.log(data);
+                    var $venueList = $('#infoWindowsMessage');
+                    $venueList.html('Unable to load data from Foursquare.');
+                });
+
+            return str;
+        };
+
+        // Hides all markers from the map
+        this.hideMarkers = function (markers) {
+            markers.forEach(function (item) {
+                item.setMap(null);
+            });
+        };
+
+        // Shows the current filtered locations
+        this.showMarkers = function (markers, locations) {
+            var locationIds = [];
+            locations.forEach(function (item) {
+                locationIds.push(item.id);
+            });
+
+            markers.forEach(function (item) {
+                if (locationIds.indexOf(item.id) > -1) {
+                    item.setMap(map);
+                }
+            });
+        };
+    }
+
+    function AppViewModel() {
+        var self = this;
+
         // Create a observable array with id and title of the marker
-        this.currentLocations = ko.observableArray([]);;
-        this.locationMarkers.forEach(function (item) {
+        this.currentLocations = ko.observableArray([]);
+        mapViewModel.locationMarkers.forEach(function (item) {
             self.currentLocations.push({
                 id: item.id,
                 title: item.title
             });
         });
 
-        this.filterQuery = ko.observable("");
+        this.filterQuery = ko.observable('');
 
         // Filters based on the query string
         this.filterQuery.subscribe(function () {
@@ -151,9 +157,9 @@ jQuery(document).ready(function () {
             self.currentLocations.removeAll();
 
             // Remove all markers from the map
-            hideMarkers(self.locationMarkers);
+            mapViewModel.hideMarkers(mapViewModel.locationMarkers);
 
-            self.locationMarkers.forEach(function (item) {
+            mapViewModel.locationMarkers.forEach(function (item) {
                 var query = self.filterQuery().toLowerCase().trim();
                 var title = item.title.toLowerCase();
 
@@ -166,30 +172,25 @@ jQuery(document).ready(function () {
             });
 
             // Show current markers based on query
-            showMarkers(self.locationMarkers, self.currentLocations());
+            mapViewModel.showMarkers(mapViewModel.locationMarkers, self.currentLocations());
         });
+
+        this.isSidebarExpanded = ko.observable(true);
 
         // Marker is clicked in the list, show the info window
         this.highlight = function (data) {
-            populateInfoWindow(self.locationMarkers[data.id - 1]); // id to index conversion
+            mapViewModel.populateInfoWindow(mapViewModel.locationMarkers[data.id - 1]); // id to index conversion
         };
 
+        // Toggles wether the sidebar is shown or hidden
         this.toggleMenu = function (data) {
-            $sidebar = $("#sidebar");
-            $sidebar.toggleClass("sidebar-fullscreen");
-            $sidebar.toggleClass("sidebar-collapsed");
-
-            $("#hamburger-icon").toggleClass("hidden");
-
-            $map = $("#map");
-            $map.toggleClass("map-fullscreen");
-            $map.toggleClass("map-collapsed");
-            google.maps.event.trigger(map, "resize");
+            this.isSidebarExpanded(!this.isSidebarExpanded());
         };
-    };
+    }
 
-    App = new AppViewModel();
-    ko.applyBindings(App);
+    mapViewModel = new MapViewModel();
+    mapViewModel.initMap();
 
-    initMap();
+    appViewModel = new AppViewModel();
+    ko.applyBindings(appViewModel);
 });

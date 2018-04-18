@@ -14,9 +14,9 @@
 </head>
 
 <body>
-    <p id="hamburger-icon" class="hidden" data-bind="click: toggleMenu">&#9776;</p>
-    <nav id="sidebar">
-        <p id="collapse-icon" class="collapse-icon-fullscreen" data-bind="click: toggleMenu">&#x2716;</p>
+    <p id="hamburger-icon" class="hidden" data-bind="click: toggleMenu, css: isSidebarExpanded() == true ? 'hidden' : ''">&#9776;</p>
+    <nav id="sidebar" data-bind="css: isSidebarExpanded() == true ? 'sidebar-shown' : 'sidebar-hidden'">
+        <p id="collapse-icon" data-bind="click: toggleMenu">&#x2716;</p>
         <h1>Salzburg</h1>
         <h2>Highlights</h2>
         <input id="filter-input" type="text" data-bind="value: filterQuery, valueUpdate: 'afterkeydown'">
@@ -24,7 +24,7 @@
             <li data-bind="text: title, click: $parent.highlight"></li>
         </ul>
     </nav>
-    <main id="map" class="map-collapsed">
+    <main id="map">
 
     </main>
 

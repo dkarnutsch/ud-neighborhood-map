@@ -99,30 +99,23 @@ textarea {
    ========================================================================== */
 
 #map {
-  height: 100%;
-}
-
-.map-fullscreen {
   width: 100%;
-  margin-left: 0;
-}
-
-.map-collapsed {
-  width: calc(100%-300px);
-  margin-left: 300px;
+  height: 100%;
 }
 
 #sidebar {
   position: absolute;
   height: 100%;
   width: 300px;
+  z-index: 1000;
+  background: white;
 }
 
-.sidebar-fullscreen {
+.sidebar-shown {
   transform: translateX(0%);
 }
 
-.sidebar-collapsed {
+.sidebar-hidden {
   transform: translateX(-100%);
 }
 
