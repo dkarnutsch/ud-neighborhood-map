@@ -100,6 +100,14 @@ textarea {
 
 #map {
   height: 100%;
+}
+
+.map-fullscreen {
+  width: 100%;
+  margin-left: 0;
+}
+
+.map-collapsed {
   width: calc(100%-300px);
   margin-left: 300px;
 }
@@ -110,27 +118,75 @@ textarea {
   width: 300px;
 }
 
-#collapse-icon {
+.sidebar-fullscreen {
+  transform: translateX(0%);
+}
+
+.sidebar-collapsed {
+  transform: translateX(-100%);
+}
+
+#collapse-icon, #hamburger-icon {
   position: absolute;
   padding: 0;
   margin: 0;
-  top: 8px;
-  right: 8px;
+  width: 48px;
+  height: 48px;
   text-align: center;
   line-height: 48px;
   font-weight: bold;
   font-size: 48px;
-  width: 48px;
-  height: 48px;
+  cursor: default;
 }
 
-#collapse-icon:hover {
-  background-color: lightgray;
+#hamburger-icon {
+  left: 8px;
+  top: 8px;
+  z-index: 9999;
+}
+
+#collapse-icon {
+  top: 8px;
+  right: 8px;
+}
+
+#sidebar>h1 {
+  margin: 0;
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  line-height: 48px;
+}
+
+#sidebar>h2 {
+  position: absolute;
+  margin: 0;
+  left: 8px;
+  top: 56px;
 }
 
 #filter-input {
-  width: 200px;
-  margin: 75px 0 25px 25px;
+  margin: 100px 8px 0 8px;
+  width: calc(100% - 20px);
+}
+
+#currentLocationsList {
+  padding: 8px;
+}
+
+#currentLocationsList>li {
+  list-style-type: none;
+  cursor: pointer;
+  line-height: 32px;
+  border-bottom: 2px solid lightgray;
+}
+
+#currentLocationsList>li:first-child {
+  border-top: 2px solid lightgray;
+}
+
+#currentLocationsList>li:hover, #collapse-icon:hover, #hamburger-icon:hover {
+  background-color: lightgray;
 }
 
 /* ==========================================================================
