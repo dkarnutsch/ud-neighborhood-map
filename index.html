@@ -14,13 +14,13 @@
 </head>
 
 <body>
-    <p id="hamburger-icon" class="hidden" data-bind="click: toggleMenu, css: isSidebarExpanded() == true ? 'hidden' : ''">&#9776;</p>
-    <nav id="sidebar" data-bind="css: isSidebarExpanded() == true ? 'sidebar-shown' : 'sidebar-hidden'">
-        <p id="collapse-icon" data-bind="click: toggleMenu">&#x2716;</p>
+    <p class="hidden hamburger-icon" data-bind="click: toggleMenu, css: isSidebarExpanded() == true ? 'hidden' : ''">&#9776;</p>
+    <nav class="sidebar" data-bind="css: isSidebarExpanded() == true ? 'sidebar-shown' : 'sidebar-hidden'">
+        <p class="collapse-icon" data-bind="click: toggleMenu">&#x2716;</p>
         <h1>Salzburg</h1>
         <h2>Highlights</h2>
-        <input id="filter-input" type="text" data-bind="value: filterQuery, valueUpdate: 'afterkeydown'">
-        <ul id="currentLocationsList" data-bind="foreach: currentLocations">
+        <input class="filter-input" type="text" data-bind="value: filterQuery, valueUpdate: 'afterkeydown'">
+        <ul class="currentLocationsList" data-bind="foreach: currentLocations">
             <li data-bind="text: title, click: $parent.highlight"></li>
         </ul>
     </nav>
@@ -30,8 +30,8 @@
 
     <script src="js/knockout-3.4.2.js"></script>
     <script src="js/jquery-3.2.1.min.js"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBC3iHbmpR6NEVrA68AoxK5lf6bNsicsaE&v=3"></script>
     <script src="js/main.js"></script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBC3iHbmpR6NEVrA68AoxK5lf6bNsicsaE&v=3&callback=googleSuccess" onerror="googleError()"></script>
 </body>
 
 </html>

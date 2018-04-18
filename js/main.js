@@ -1,4 +1,4 @@
-jQuery(document).ready(function () {
+function App() {
     var appViewModel = {};
     var mapViewModel = {};
 
@@ -71,7 +71,7 @@ jQuery(document).ready(function () {
             // Check to make sure the infowindow is not already opened on this marker.
             if (largeInfowindow.marker != marker) {
                 // Clear the infowindow content to give the streetview time to load.
-                largeInfowindow.setContent(self.getMarkerContent(marker.title, marker.position.lat(), marker.position.lng()));
+                largeInfowindow.setContent('<h2>Restaurant recommendations near ' + marker.title + '</h2>');
                 largeInfowindow.marker = marker;
                 // Make sure the marker property is cleared if the infowindow is closed.
                 largeInfowindow.addListener('closeclick', function () {
@@ -81,6 +81,9 @@ jQuery(document).ready(function () {
                 // Open the infowindow on the correct marker.
                 largeInfowindow.open(map, marker);
 
+                // Load API information
+                self.populateRestaurantInformation(marker.position.lat(), marker.position.lng());
+
                 // start the animation
                 marker.setAnimation(google.maps.Animation.BOUNCE);
                 setTimeout(function () { marker.setAnimation(null); }, 750); // stop after one bounce
@@ -88,7 +91,7 @@ jQuery(document).ready(function () {
         };
 
         // Feteches information about nearby restaurants using the FourSquare API
-        this.getMarkerContent = function (title, lat, lng) {
+        this.populateRestaurantInformation = function (lat, lng) {
             const foursquare_client_id = 'K4X2LMMP4H1X20XFK51GMHQN4FMQ433RFOWMPEBH3INMRXEB';
             const foursquare_client_secret = 'PZOAFTSG4VXHXZ0LS312FWDZOV5H1COQMMLV111WNW0LMQDL';
             const categoryId = '4d4b7105d754a06374d81259'; // Restaurant: see https://developer.foursquare.com/docs/resources/categories
@@ -96,23 +99,18 @@ jQuery(document).ready(function () {
             var url = 'https://api.foursquare.com/v2/venues/search?v=20180323&radius=100&client_id=' + foursquare_client_id +
                 '&client_secret=' + foursquare_client_secret + '&categoryId=' + categoryId + '&ll=' + lat + ',' + lng;
 
-            var str = '<h2>Restaurant recommendations near ' + title + '</h2><div id="infoWindowsMessage"></div>';
-
             $.ajax(url)
                 .done(function (data) {
-                    var $venueList = $('#infoWindowsMessage');
-
+                    venueStr = '<p>';
                     data.response.venues.forEach(function (venue) {
-                        $venueList.html($venueList.html() + venue.name + ' -- ' + venue.location.formattedAddress.join(', ') + '<br>');
+                        venueStr += venue.name + ' -- ' + venue.location.formattedAddress.join(', ') + '<br>';
                     });
+                    largeInfowindow.setContent(largeInfowindow.getContent() + venueStr + '</p>');
                 })
                 .fail(function (data) {
                     console.log(data);
-                    var $venueList = $('#infoWindowsMessage');
-                    $venueList.html('Unable to load data from Foursquare.');
+                    largeInfowindow.setContent(largeInfowindow.getContent() + '<p>Unable to load data from Foursquare.</p>');
                 });
-
-            return str;
         };
 
         // Hides all markers from the map
@@ -193,4 +191,13 @@ jQuery(document).ready(function () {
 
     appViewModel = new AppViewModel();
     ko.applyBindings(appViewModel);
-});
+}
+
+var googleSuccess = function() {
+    new App();
+};
+
+var googleError = function() {
+    alert("Error loading Google Maps API. Please try again later.")
+};
+
