@@ -103,8 +103,10 @@ function App() {
                 .done(function (data) {
                     venueStr = '<p>';
                     data.response.venues.forEach(function (venue) {
-                        venueStr += venue.name + ' -- ' + venue.location.formattedAddress.join(', ') + '<br>';
+                        console.log(venue);
+                        venueStr += '<a href="http://foursquare.com/v/' + venue.id + '">' + venue.name + '</a> ' + ' -- ' + venue.location.formattedAddress.join(', ') + '<br>';
                     });
+                    venueStr += '<br><br>Powered by Foursquare.'
                     largeInfowindow.setContent(largeInfowindow.getContent() + venueStr + '</p>');
                 })
                 .fail(function (data) {
@@ -193,11 +195,11 @@ function App() {
     ko.applyBindings(appViewModel);
 }
 
-var googleSuccess = function() {
+var googleSuccess = function () {
     new App();
 };
 
-var googleError = function() {
+var googleError = function () {
     alert("Error loading Google Maps API. Please try again later.")
 };
 
